@@ -44,8 +44,28 @@ export default function App() {
   const [items, setItems] = useState<StoredItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [latestUsers, setLatestUsers] = useState<User[]>([]);
 
   useEffect(() => {
+
+
+    const fetchLatestUsers = async () => {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('user_id, email, created_at')
+        .order('created_at', { ascending: false })
+        .limit(10);
+    
+      if (error) {
+        console.error('Failed to fetch latest users:', error);
+      } else {
+        setLatestUsers(data || []);
+      }
+    };
+    
+    fetchLatestUsers();
+
+    
     const fetchUsers = async () => {
       const { data, error } = await supabase
         .from('user_profiles')
@@ -106,6 +126,42 @@ export default function App() {
 
   return (
     <div style={{ padding: 20, fontFamily: 'sans-serif', maxWidth: 800 }}>
+      {latestUsers.length > 0 && (
+  <div style={{ marginBottom: 30 }}>
+    <h3 style={{ marginBottom: 10 }}>🧑‍💻 Latest Users</h3>
+    <div
+      style={{
+        display: 'flex',
+        overflowX: 'auto',
+        gap: '12px',
+        paddingBottom: 10,
+        scrollbarWidth: 'thin'
+      }}
+    >
+      {latestUsers.map((u) => (
+        <div
+          key={u.user_id}
+          style={{
+            flex: '0 0 auto',
+            minWidth: 200,
+            padding: 12,
+            border: '1px solid #ddd',
+            borderRadius: 8,
+            backgroundColor: '#f9f9f9',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>{u.email}</div>
+          <div style={{ fontSize: '0.85em', color: '#666' }}>
+            {new Date(u.created_at).toLocaleString()}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
       <h2>Transcript Feedback Viewer</h2>
 
       <label htmlFor="email">Filter by user email:</label>
