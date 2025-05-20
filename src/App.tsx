@@ -154,7 +154,9 @@ export default function App() {
         >
           <div style={{ fontWeight: 600 }}>{u.email}</div>
           <div style={{ fontSize: '0.85em', color: '#666' }}>
-            {new Date(u.created_at).toLocaleString()}
+          {u.created_at
+  ? new Date(u.created_at).toLocaleString()
+  : <em>Unknown date</em>}
           </div>
         </div>
       ))}
